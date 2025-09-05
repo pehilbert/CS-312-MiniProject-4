@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Application</title>
+</head>
+<body>
+    <form action="/create" method="POST">
+        <label for="author">Author:</label>
+        <input type="text" name="author" required />
+        <label for="title">Title:</label>
+        <input type="text" name="title" required />
+        <label for="content">Content:</label>
+        <input type="text" name="content" required />
+        <button type="submit">Create</button>
+    </form>
+    <div>
+        <% if (locals.posts && locals.posts.length > 0) { %>
+            <% posts.forEach(function(post) { %>
+                <div>
+                    <h2><%= post.title %></h2>
+                    <p><%= post.content %></p>
+                    <p>By: <%= post.author %></p>
+                    <p><%= post.timestamp %></p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No posts available.</p>
+        <% } %>
+    </div>
+</body>
+</html>
