@@ -1,9 +1,11 @@
 const express = require('express');
 const { format } = require('date-fns');
 
-// Constants
-const posts = [];
-const PORT = 3000;
+// Globals
+const PORT = 80;
+
+let posts = [];
+let currentId = 0;
 
 // Initialize express
 const app = express();
@@ -13,6 +15,7 @@ app.set('view engine', 'ejs');
 
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Routes
 app.get('/', (req, res) => {
@@ -20,7 +23,23 @@ app.get('/', (req, res) => {
 });
 
 app.get('/edit', (req, res) => {
-    res.render('pages/edit');
+    const post = posts.find(post => post.id === parseInt(req.query.id));
+
+    if (!post) {
+        return res.status(404).render('pages/error', { message: 'Post to edit not found' });
+    }
+
+    res.render('pages/edit', post);
+});
+
+app.get('/delete', (req, res) => {
+    const post = posts.find(post => post.id === parseInt(req.query.id));
+
+    if (!post) {
+        return res.status(404).render('pages/error', { message: 'Post to delete not found' });
+    }
+
+    res.render('pages/delete', post);
 });
 
 app.post('/create', (req, res) => {
@@ -28,6 +47,7 @@ app.post('/create', (req, res) => {
 
     if (author && title && content) {
         const newPost = {
+            id: ++currentId,
             author,
             title,
             content,
@@ -40,7 +60,19 @@ app.post('/create', (req, res) => {
     }
 });
 
+app.post('/edit', (req, res) => {
+    const { id, author, title, content } = req.body;
+    const postIndex = posts.findIndex(post => post.id === parseInt(id));
+    posts[postIndex] = { ...posts[postIndex], author, title, content };
+    res.redirect('/');
+});
+
+app.post('/delete', (req, res) => {
+    posts = posts.filter(post => post.id !== parseInt(req.body.id));
+    res.redirect('/');
+});
+
 // Start app
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

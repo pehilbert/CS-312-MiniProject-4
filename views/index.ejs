@@ -4,29 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Application</title>
+    <link rel="stylesheet" href="/stylesheets/index.css">
 </head>
 <body>
-    <form action="/create" method="POST">
+    <form action="/create" method="POST" class="create-form">
+        <h2>Create Post</h2>
         <label for="author">Author:</label>
-        <input type="text" name="author" required />
+        <input type="text" name="author" required class="input-field" />
         <label for="title">Title:</label>
-        <input type="text" name="title" required />
+        <input type="text" name="title" required class="input-field" />
         <label for="content">Content:</label>
-        <input type="text" name="content" required />
-        <button type="submit">Create</button>
+        <textarea name="content" required class="input-field content-input"></textarea>
+        <button type="submit" class="submit-btn">Post</button>
     </form>
-    <div>
+    <div class="posts-container">
         <% if (locals.posts && locals.posts.length > 0) { %>
             <% posts.forEach(function(post) { %>
-                <div>
-                    <h2><%= post.title %></h2>
-                    <p><%= post.content %></p>
-                    <p>By: <%= post.author %></p>
-                    <p><%= post.timestamp %></p>
+                <div class="post">
+                    <h2 class="post-title"><%= post.title %></h2>
+                    <p class="post-content"><%= post.content %></p>
+                    <p class="post-author">By: <%= post.author %></p>
+                    <p class="post-timestamp"><%= post.timestamp %></p>
+                    <a href="/edit?id=<%= post.id %>" class="edit-btn">Edit</a>
+                    <a href="/delete?id=<%= post.id %>" class="delete-btn">Delete</a>
                 </div>
             <% }); %>
         <% } else { %>
-            <p>No posts available.</p>
+            <p class="no-posts">No posts available.</p>
         <% } %>
     </div>
 </body>

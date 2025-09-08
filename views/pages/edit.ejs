@@ -1,1 +1,23 @@
-<h1>You are now editing</h1>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Edit Post</title>
+	<link rel="stylesheet" href="/stylesheets/index.css">
+</head>
+<body>
+	<form action="/edit" method="POST" class="create-form">
+        <h2>Edit Post</h2>
+        <input type="hidden" name="id" value="<%= locals.id %>">
+		<label for="author">Author:</label>
+		<input type="text" name="author" required class="input-field" value="<%= locals.author %>" />
+		<label for="title">Title:</label>
+		<input type="text" name="title" required class="input-field" value="<%= locals.title %>" />
+		<label for="content">Content:</label>
+		<textarea name="content" required class="input-field content-input" rows="8"><%= locals.content %></textarea>
+		<button type="submit" class="submit-btn">Update</button>
+	</form>
+</body>
+</html>
