@@ -55,7 +55,7 @@ app.get('/delete', (req, res) => {
 app.post('/create', (req, res) => {
     const { author, title, content, category } = req.body;
 
-    if (author && title && content) {
+    if (author && title && content, category) {
         const newPost = {
             id: ++currentId,
             author,
@@ -75,7 +75,7 @@ app.post('/create', (req, res) => {
 app.post('/edit', (req, res) => {
     const { id, author, title, content, category } = req.body;
     const postIndex = posts.findIndex(post => post.id === parseInt(id));
-    posts[postIndex] = { author, title, content, category };
+    posts[postIndex] = { ...posts[postIndex], author, title, content, category };
     res.redirect('/');
 });
 
