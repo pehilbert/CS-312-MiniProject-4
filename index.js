@@ -18,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // Routes
+
+// Main page
 app.get('/', (req, res) => {
     if (req.query && req.query.filter) {
         const filteredPosts = posts.filter(post => post.category === req.query.filter);
@@ -27,6 +29,7 @@ app.get('/', (req, res) => {
     res.render('index', { posts });
 });
 
+// Edit post form
 app.get('/edit', (req, res) => {
     const post = posts.find(post => post.id === parseInt(req.query.id));
 
@@ -37,6 +40,7 @@ app.get('/edit', (req, res) => {
     res.render('pages/edit', post);
 });
 
+// Delete post confirmation page
 app.get('/delete', (req, res) => {
     const post = posts.find(post => post.id === parseInt(req.query.id));
 
@@ -47,6 +51,7 @@ app.get('/delete', (req, res) => {
     res.render('pages/delete', post);
 });
 
+// Create post logic
 app.post('/create', (req, res) => {
     const { author, title, content, category } = req.body;
 
@@ -66,13 +71,15 @@ app.post('/create', (req, res) => {
     }
 });
 
+// Edit post logic
 app.post('/edit', (req, res) => {
     const { id, author, title, content, category } = req.body;
     const postIndex = posts.findIndex(post => post.id === parseInt(id));
-    posts[postIndex] = { ...posts[postIndex], author, title, content, category };
+    posts[postIndex] = { author, title, content, category };
     res.redirect('/');
 });
 
+// Delete post logic
 app.post('/delete', (req, res) => {
     posts = posts.filter(post => post.id !== parseInt(req.body.id));
     res.redirect('/');
