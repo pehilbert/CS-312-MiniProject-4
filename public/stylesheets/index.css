@@ -5,13 +5,35 @@ body {
 	padding: 0;
 }
 
+.toggle-btn {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	background: #4a6c98;
+	font-size: 2rem;
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	width: 50px;
+	height: 50px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	transition: 0.2s;
+}
+
+.toggle-btn:hover {
+	background: #344b69;
+}
+
+.create-form-container {
+	margin: 1rem auto;
+	max-width: 700px;
+}
+
 .create-form {
 	background: #fff;
 	padding: 2rem;
-	margin: 5px auto;
-	max-width: 500px;
 	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
@@ -31,7 +53,7 @@ body {
 }
 
 .submit-btn {
-	background: #007bff;
+	background: #4a6c98;
     padding: 0.5rem 0.5rem;
 	color: #fff;
 	border: none;
@@ -44,13 +66,13 @@ body {
 }
 
 .submit-btn:hover {
-	background: #0056b3;
+	background: #344b69;
 }
 
 .edit-btn {
-	background: #ffc107;
+	color: #fff;
+	background: #4a6c98;
     padding: 0.5rem 0.5rem;
-	color: #212529;
 	border: none;
 	border-radius: 4px;
 	font-size: 1rem;
@@ -61,11 +83,11 @@ body {
 	margin-right: 0.5rem;
 }
 .edit-btn:hover {
-	background: #e0a800;
+	background: #344b69;
 }
 
 .delete-btn {
-	background: #dc3545;
+	background: #a72532;
     padding: 0.5rem 0.5rem;
 	color: #fff;
 	border: none;
@@ -77,21 +99,30 @@ body {
 	display: inline-block;
 }
 .delete-btn:hover {
-	background: #c82333;
+	background: rgb(123, 24, 34);
 }
 
 .posts-container {
 	max-width: 700px;
-	margin: 2rem auto;
+	margin: 1rem auto;
 	padding: 1rem;
+}
+
+.post-filter-input {
+	margin-bottom: 1rem;
 }
 
 .post {
 	background: #fff;
 	border-radius: 8px;
 	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-	padding: 1.5rem;
+	padding: 1rem;
 	margin-bottom: 1.5rem;
+}
+
+.post-category {
+	float: right;
+	margin-top: 0;
 }
 
 .post-title {
@@ -106,18 +137,16 @@ body {
 }
 
 .post-author {
-	font-size: 0.95rem;
 	color: #666;
 }
 
 .post-timestamp {
-	font-size: 0.9rem;
 	color: #999;
 }
 
 .no-posts {
 	text-align: center;
 	color: #888;
-	font-size: 1.1rem;
+	font-size: 1.2rem;
 	margin-top: 2rem;
 }

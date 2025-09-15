@@ -7,20 +7,49 @@
     <link rel="stylesheet" href="/stylesheets/index.css">
 </head>
 <body>
-    <form action="/create" method="POST" class="create-form">
-        <h2>Create Post</h2>
-        <label for="author">Author:</label>
-        <input type="text" name="author" required class="input-field" />
-        <label for="title">Title:</label>
-        <input type="text" name="title" required class="input-field" />
-        <label for="content">Content:</label>
-        <textarea name="content" required class="input-field content-input"></textarea>
-        <button type="submit" class="submit-btn">Post</button>
+    <form action="/create" method="POST" class="create-form-container">
+        <button id="toggle-create-form" class="toggle-btn" type="button">+</button>
+        <div id="create-form-body" class="create-form" style="display:none;">
+            <h2>Create Post</h2>
+            <label for="author">Author:</label>
+            <input type="text" name="author" required class="input-field" />
+            <label for="title">Title:</label>
+            <input type="text" name="title" required class="input-field" />
+            <label for="content">Content:</label>
+            <textarea name="content" required class="input-field content-input"></textarea>
+            <label for="category">Category:</label>
+            <select name="category" class="input-field">
+                <option value="" disabled selected>Select Category</option>
+                <option value="General">General</option>
+                <option value="Tech">Tech</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Fashion">Fashion</option>
+            </select>
+            <button type="submit" class="submit-btn">Post</button>
+        </div>
     </form>
     <div class="posts-container">
+        <form method="GET" action="/">
+            <select name="filter" class="input-field post-filter-input" onchange="this.form.submit()">
+                <option value="" disabled selected>Filter by Category</option>
+                <option value="General">General</option>
+                <option value="Tech">Tech</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Fashion">Fashion</option>
+                <option value="">Show All</option>
+            </select>
+            <% if (locals.filter) { %>
+                <p>Currently filtering by: <strong><%= locals.filter %></strong><br/><a href="/">Remove filter</a></p>
+            <% } %>
+        </form>
         <% if (locals.posts && locals.posts.length > 0) { %>
-            <% posts.forEach(function(post) { %>
+            <% locals.posts.forEach(function(post) { %>
                 <div class="post">
+                    <p class="post-category"><b><%= post.category %></b></p>
                     <h2 class="post-title"><%= post.title %></h2>
                     <p class="post-content"><%= post.content %></p>
                     <p class="post-author">By: <%= post.author %></p>
@@ -30,8 +59,19 @@
                 </div>
             <% }); %>
         <% } else { %>
-            <p class="no-posts">No posts available.</p>
+            <p class="no-posts">No posts available. Click '<strong>+</strong>' to create one.</p>
         <% } %>
     </div>
+    <script>
+        const toggleBtn = document.getElementById('toggle-create-form');
+        const createForm = document.getElementById('create-form-body');
+        let formVisible = false;
+
+        toggleBtn.addEventListener('click', function() {
+            formVisible = !formVisible;
+            createForm.style.display = formVisible ? 'flex' : 'none';
+            toggleBtn.textContent = formVisible ? '-' : '+';
+        });
+    </script>
 </body>
 </html>

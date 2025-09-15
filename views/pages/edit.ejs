@@ -17,6 +17,16 @@
 		<input type="text" name="title" required class="input-field" value="<%= locals.title %>" />
 		<label for="content">Content:</label>
 		<textarea name="content" required class="input-field content-input" rows="8"><%= locals.content %></textarea>
+		<label for="categeory">Category:</label>
+		<select name="category" class="input-field">
+			<option value="" disabled selected>Select Category</option>
+			<option value="General">General</option>
+			<option value="Tech">Tech</option>
+			<option value="Lifestyle">Lifestyle</option>
+			<option value="Food">Food</option>
+			<option value="Travel">Travel</option>
+			<option value="Fashion">Fashion</option>
+		</select>
 		<button type="submit" class="submit-btn">Update</button>
 	</form>
 </body>

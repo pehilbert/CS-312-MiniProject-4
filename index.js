@@ -19,6 +19,11 @@ app.use(express.static('public'));
 
 // Routes
 app.get('/', (req, res) => {
+    if (req.query && req.query.filter) {
+        const filteredPosts = posts.filter(post => post.category === req.query.filter);
+        return res.render('index', { posts: filteredPosts, filter: req.query.filter });
+    }
+
     res.render('index', { posts });
 });
 
@@ -43,7 +48,7 @@ app.get('/delete', (req, res) => {
 });
 
 app.post('/create', (req, res) => {
-    const { author, title, content } = req.body;
+    const { author, title, content, category } = req.body;
 
     if (author && title && content) {
         const newPost = {
@@ -51,6 +56,7 @@ app.post('/create', (req, res) => {
             author,
             title,
             content,
+            category,
             timestamp: format(new Date(), 'MMMM d, yyyy hh:mm a')
         };
         posts.push(newPost);
@@ -61,9 +67,9 @@ app.post('/create', (req, res) => {
 });
 
 app.post('/edit', (req, res) => {
-    const { id, author, title, content } = req.body;
+    const { id, author, title, content, category } = req.body;
     const postIndex = posts.findIndex(post => post.id === parseInt(id));
-    posts[postIndex] = { ...posts[postIndex], author, title, content };
+    posts[postIndex] = { ...posts[postIndex], author, title, content, category };
     res.redirect('/');
 });
 
