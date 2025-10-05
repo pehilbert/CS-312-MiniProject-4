@@ -78,6 +78,16 @@ app.get('/delete', (req, res) => {
     res.render('pages/delete', post);
 });
 
+// Sign up page
+app.get('/signup', (req, res) => {
+    res.render('pages/signup');
+});
+
+// Login page
+app.get('/login', (req, res) => {
+    res.render('pages/login');
+});
+
 // Create post logic
 app.post('/create', (req, res) => {
     const { author, title, content, category } = req.body;
