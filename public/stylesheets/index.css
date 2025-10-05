@@ -162,3 +162,7 @@ body {
 	max-width: 400px;
 	margin: 2rem auto;
 }
+
+.signup-link {
+	text-align: center;
+}

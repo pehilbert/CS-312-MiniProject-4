@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="/stylesheets/index.css">
 </head>
 <body>
+    <% if (locals.user_id) { %>
+        <p>Currently signed in as: <%= locals.user_id %></p>
+        <a href="/">Sign Out</a>
+    <% } else { %>
+        <a href="/login">Log In</a>
+    <% } %>
     <form action="/create" method="POST" class="create-form-container">
         <button id="toggle-create-form" class="toggle-btn" type="button">+</button>
         <div id="create-form-body" class="create-form" style="display:none;">
@@ -54,8 +60,10 @@
                     <p class="post-content"><%= post.content %></p>
                     <p class="post-author">By: <%= post.author %></p>
                     <p class="post-timestamp"><%= post.timestamp %></p>
-                    <a href="/edit?id=<%= post.id %>" class="edit-btn">Edit</a>
-                    <a href="/delete?id=<%= post.id %>" class="delete-btn">Delete</a>
+                    <% if (locals.user_id && locals.user_id === post.author_id) { %>
+                        <a href="/edit?id=<%= post.id %>&?user_id=<%= locals.user_id %>" class="edit-btn">Edit</a>
+                        <a href="/delete?id=<%= post.id %>&?user_id=<%= locals.user_id %>" class="delete-btn">Delete</a>
+                    <% } %>
                 </div>
             <% }); %>
         <% } else { %>
