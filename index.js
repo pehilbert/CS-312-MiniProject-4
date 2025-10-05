@@ -1,4 +1,5 @@
 const express = require('express');
+const pg = require('pg');
 const { format } = require('date-fns');
 
 // Globals
@@ -6,6 +7,16 @@ const PORT = 80;
 
 let posts = [];
 let currentId = 0;
+
+const db = new pg.Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'BlogsDB',
+    password: 'password',
+    port: 5432,
+});
+
+db.connect();
 
 // Initialize express
 const app = express();
@@ -21,12 +32,28 @@ app.use(express.static('public'));
 
 // Main page
 app.get('/', (req, res) => {
-    if (req.query && req.query.filter) {
-        const filteredPosts = posts.filter(post => post.category === req.query.filter);
-        return res.render('index', { posts: filteredPosts, filter: req.query.filter });
-    }
+    db.query('SELECT * FROM blogs', (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.render('pages/error', { message: 'Database error' });
+        }
 
-    res.render('index', { posts });
+        const dbPosts = result.rows.map(row => ({
+            id: row.blog_id,
+            author: row.creator_name,
+            title: row.title,
+            content: row.body,
+            category: row.category,
+            timestamp: format(new Date(row.date_created), 'MMMM d, yyyy hh:mm a')
+        }));
+
+        if (req.query && req.query.filter) {
+            const filteredPosts = dbPosts.filter(post => post.category === req.query.filter);
+            return res.render('index', { posts: filteredPosts, filter: req.query.filter });
+        }
+
+        res.render('index', { posts: dbPosts });
+    });
 });
 
 // Edit post form
