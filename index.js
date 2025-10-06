@@ -90,22 +90,38 @@ app.get('/login', (req, res) => {
 });
 
 // Create post logic
-app.post('/create', (req, res) => {
-    const { author, title, content, category } = req.body;
+app.post('/create', async (req, res) => {
+    const { title, content, category, user_id } = req.body;
 
-    if (author && title && content, category) {
-        const newPost = {
-            id: ++currentId,
-            author,
-            title,
-            content,
-            category,
-            timestamp: format(new Date(), 'MMMM d, yyyy hh:mm a')
-        };
-        posts.push(newPost);
-        res.redirect('/');
-    } else {
-        res.status(400).send('All fields are required.');
+    if (!user_id) {
+        return res.render('pages/error', { message: "You must be signed in to create a post." });
+    }
+
+    if (!title || !content || !category) {
+        return res.render('pages/error', { message: "All values must be provided to create a post." });
+    }
+
+    try {
+        const getName = await db.query(
+            'SELECT name FROM users WHERE user_id = $1',
+            [user_id.trim()]
+        );
+
+        if (getName.rowCount === 0) {
+            return res.render('pages/error', { message: "Invalid user signed in to create post. Sign in again." });
+        }
+
+        const username = getName.rows[0].name;
+
+        await db.query(
+            'INSERT INTO blogs(creator_name, creator_user_id, title, body, date_created, category) VALUES ($1, $2, $3, $4, NOW(), $5)',
+            [username, user_id.trim(), title, content, category]
+        );
+
+        res.redirect(`/?user_id=${user_id.trim()}`);
+    } catch (err) {
+        console.error(err);
+        res.render('pages/error', { message: 'Database error' });
     }
 });
 

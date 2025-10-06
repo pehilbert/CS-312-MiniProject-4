@@ -10,32 +10,31 @@
     <% if (locals.user_id) { %>
         <p>Currently signed in as: <%= locals.user_id %></p>
         <a href="/">Sign Out</a>
+        <form action="/create" method="POST" class="create-form-container">
+            <button id="toggle-create-form" class="toggle-btn" type="button">+</button>
+            <div id="create-form-body" class="create-form" style="display:none;">
+                <h2>Create Post</h2>
+                <label for="title">Title:</label>
+                <input type="text" name="title" required class="input-field" />
+                <label for="content">Content:</label>
+                <textarea name="content" required class="input-field content-input"></textarea>
+                <label for="category">Category:</label>
+                <select required name="category" class="input-field">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="General">General</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Lifestyle">Lifestyle</option>
+                    <option value="Food">Food</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Fashion">Fashion</option>
+                </select>
+                <input name="user_id" value="<%= locals.user_id %>" style="display:none" />
+                <button type="submit" class="submit-btn">Post</button>
+            </div>
+        </form>
     <% } else { %>
-        <a href="/login">Log In</a>
+        <a href="/login">Log In to create posts</a>
     <% } %>
-    <form action="/create" method="POST" class="create-form-container">
-        <button id="toggle-create-form" class="toggle-btn" type="button">+</button>
-        <div id="create-form-body" class="create-form" style="display:none;">
-            <h2>Create Post</h2>
-            <label for="author">Author:</label>
-            <input type="text" name="author" required class="input-field" />
-            <label for="title">Title:</label>
-            <input type="text" name="title" required class="input-field" />
-            <label for="content">Content:</label>
-            <textarea name="content" required class="input-field content-input"></textarea>
-            <label for="category">Category:</label>
-            <select required name="category" class="input-field">
-                <option value="" disabled selected>Select Category</option>
-                <option value="General">General</option>
-                <option value="Tech">Tech</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Food">Food</option>
-                <option value="Travel">Travel</option>
-                <option value="Fashion">Fashion</option>
-            </select>
-            <button type="submit" class="submit-btn">Post</button>
-        </div>
-    </form>
     <div class="posts-container">
         <form method="GET" action="/">
             <select name="filter" class="input-field post-filter-input" onchange="this.form.submit()">
@@ -48,6 +47,9 @@
                 <option value="Fashion">Fashion</option>
                 <option value="">Show All</option>
             </select>
+            <% if (locals.user_id) { %>
+                <input name="user_id" style="display:none" value="<%= locals.user_id %>" />
+            <% } %>
             <% if (locals.filter) { %>
                 <p>Currently filtering by: <strong><%= locals.filter %></strong><br/><a href="/">Remove filter</a></p>
             <% } %>
