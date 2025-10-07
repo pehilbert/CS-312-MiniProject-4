@@ -17,6 +17,7 @@
             <p class="post-author">By: <%= author %></p>
         </div>
 		<form action="/delete" method="POST">
+			<input type="hidden" name="user_id" value="<%= user_id %>" />
 			<input type="hidden" name="id" value="<%= id %>" />
 			<button type="submit" class="delete-btn">Delete</button>
             <button type="button" onclick="window.location.href='/'" class="submit-btn">Go Back</button>

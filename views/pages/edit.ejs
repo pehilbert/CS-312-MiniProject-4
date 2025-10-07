@@ -11,8 +11,7 @@
 	<form action="/edit" method="POST" class="create-form">
         <h2>Edit Post</h2>
         <input type="hidden" name="id" value="<%= locals.id %>">
-		<label for="author">Author:</label>
-		<input type="text" name="author" required class="input-field" value="<%= locals.author %>" />
+		<input type="hidden" name="user_id" value="<%= locals.user_id %>">
 		<label for="title">Title:</label>
 		<input type="text" name="title" required class="input-field" value="<%= locals.title %>" />
 		<label for="content">Content:</label>

@@ -8,8 +8,10 @@
 </head>
 <body>
     <% if (locals.user_id) { %>
-        <p>Currently signed in as: <%= locals.user_id %></p>
-        <a href="/">Sign Out</a>
+        <div style="padding: 2rem; margin: 1rem auto; width: fit-content;">
+            <p>Currently signed in as: <%= locals.user_id %></p>
+            <a class="login-btn" href="/">Sign Out</a>
+        </div>
         <form action="/create" method="POST" class="create-form-container">
             <button id="toggle-create-form" class="toggle-btn" type="button">+</button>
             <div id="create-form-body" class="create-form" style="display:none;">
@@ -33,7 +35,9 @@
             </div>
         </form>
     <% } else { %>
-        <a href="/login">Log In to create posts</a>
+        <div style="padding: 2rem; margin: 1rem auto; width: fit-content;">
+            <a class="login-btn" href="/login">Log In to create posts</a>
+        </div>
     <% } %>
     <div class="posts-container">
         <form method="GET" action="/">
@@ -63,8 +67,8 @@
                     <p class="post-author">By: <%= post.author %></p>
                     <p class="post-timestamp"><%= post.timestamp %></p>
                     <% if (locals.user_id && locals.user_id === post.author_id) { %>
-                        <a href="/edit?id=<%= post.id %>&?user_id=<%= locals.user_id %>" class="edit-btn">Edit</a>
-                        <a href="/delete?id=<%= post.id %>&?user_id=<%= locals.user_id %>" class="delete-btn">Delete</a>
+                        <a href="/edit?id=<%= post.id %>&user_id=<%= locals.user_id %>" class="edit-btn">Edit</a>
+                        <a href="/delete?id=<%= post.id %>&user_id=<%= locals.user_id %>" class="delete-btn">Delete</a>
                     <% } %>
                 </div>
             <% }); %>

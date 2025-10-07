@@ -32,6 +32,8 @@ app.use(express.static('public'));
 
 // Main page
 app.get('/', (req, res) => {
+    const {filter, user_id} = req.query || {};
+
     db.query('SELECT * FROM blogs', (err, result) => {
         if (err) {
             console.error(err);
@@ -48,35 +50,91 @@ app.get('/', (req, res) => {
             timestamp: format(new Date(row.date_created), 'MMMM d, yyyy hh:mm a')
         }));
 
-        if (req.query && req.query.filter) {
-            const filteredPosts = dbPosts.filter(post => post.category === req.query.filter);
-            return res.render('index', { posts: filteredPosts, filter: req.query.filter, user_id: req.query.user_id });
+        if (filter) {
+            const filteredPosts = dbPosts.filter(post => post.category === filter);
+            return res.render('index', { posts: filteredPosts, filter: filter, user_id: user_id });
         }
 
-        res.render('index', { posts: dbPosts, user_id: req.query.user_id });
+        res.render('index', { posts: dbPosts, user_id: user_id });
     });
 });
 
 // Edit post form
 app.get('/edit', (req, res) => {
-    const post = posts.find(post => post.id === parseInt(req.query.id));
+    const {id, user_id} = req.query || {};
 
-    if (!post) {
-        return res.status(404).render('pages/error', { message: 'Post to edit not found' });
+    if (!id || !user_id) {
+        return res.render('pages/error', { message: 'An error ocurrred loading this page' });
     }
 
-    res.render('pages/edit', post);
+    db.query(
+        "SELECT * FROM blogs WHERE blog_id = $1",
+        [id],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.render('pages/error', { message: 'Database error' });
+            }
+
+            if (result.rowCount === 0) {
+                return res.status(404).render('pages/error', { message: 'Post to edit not found' });
+            }
+
+            const dbPost = result.rows[0];
+
+            if (dbPost.creator_user_id !== user_id.trim()) {
+                return res.status(403).render('pages/error', { message: "You are not authorized to edit this post." });
+            }
+
+            const post = {
+                id: dbPost.blog_id,
+                title: dbPost.title,
+                content: dbPost.body
+            };
+
+            res.render('pages/edit', post);
+        }
+    );
 });
 
 // Delete post confirmation page
 app.get('/delete', (req, res) => {
-    const post = posts.find(post => post.id === parseInt(req.query.id));
+    const {id, user_id} = req.query || {};
 
-    if (!post) {
-        return res.status(404).render('pages/error', { message: 'Post to delete not found' });
+    if (!id || !user_id) {
+        return res.render('pages/error', { message: 'An error ocurrred loading this page' });
     }
 
-    res.render('pages/delete', post);
+    db.query(
+        "SELECT * FROM blogs WHERE blog_id = $1",
+        [id],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.render('pages/error', { message: 'Database error' });
+            }
+
+            if (result.rowCount === 0) {
+                return res.status(404).render('pages/error', { message: 'Post to delete not found' });
+            }
+
+            const dbPost = result.rows[0];
+
+            if (dbPost.creator_user_id !== user_id.trim()) {
+                return res.status(403).render('pages/error', { message: "You are not authorized to delete this post." });
+            }
+
+            const values = {
+                id: dbPost.blog_id,
+                title: dbPost.title,
+                content: dbPost.body,
+                author: dbPost.creator_name,
+                user_id: user_id
+            };
+
+            res.render('pages/delete', values);
+        }
+    );
 });
 
 // Sign up page
@@ -127,16 +185,46 @@ app.post('/create', async (req, res) => {
 
 // Edit post logic
 app.post('/edit', (req, res) => {
-    const { id, author, title, content, category } = req.body;
-    const postIndex = posts.findIndex(post => post.id === parseInt(id));
-    posts[postIndex] = { ...posts[postIndex], author, title, content, category };
-    res.redirect('/');
+    const { id, title, content, category, user_id } = req.body || {};
+
+    if (!id || !title || !content || !category) {
+        return res.render('pages/error', { message: "All values must be provided to edit a post" });
+    }
+
+    db.query(
+        "UPDATE blogs SET title = $1, body = $2, category = $3 WHERE blog_id = $4",
+        [title, content, category, id],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.render('pages/error', { message: "Database error" });
+            }
+
+            res.redirect(`/?user_id=${user_id.trim()}`);
+        }
+    );
 });
 
 // Delete post logic
 app.post('/delete', (req, res) => {
-    posts = posts.filter(post => post.id !== parseInt(req.body.id));
-    res.redirect('/');
+    const { id, user_id } = req.body || {};
+
+    if (!id || !user_id) {
+        return res.render('pages/error', { message: "A post ID must be provided to delete a post." });
+    }
+
+    db.query(
+        "DELETE FROM blogs WHERE blog_id = $1",
+        [id],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.render('pages/error', { message: "Database error" });
+            }
+
+            res.redirect(`/?user_id=${user_id.trim()}`);
+        }
+    );
 });
 
 // Sign up Logic
