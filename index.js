@@ -89,10 +89,11 @@ app.get('/edit', (req, res) => {
             const post = {
                 id: dbPost.blog_id,
                 title: dbPost.title,
-                content: dbPost.body
+                content: dbPost.body,
+                category: dbPost.category
             };
 
-            res.render('pages/edit', post);
+            res.render('pages/edit', { ...post, user_id: user_id.trim() });
         }
     );
 });
