@@ -1,6 +1,7 @@
 const express = require('express');
 const pg = require('pg');
 const { format } = require('date-fns');
+const cors = require('cors');
 
 // Globals
 const PORT = 80;
@@ -24,20 +25,28 @@ const app = express();
 // Initialize EJS
 app.set('view engine', 'ejs');
 
+// CORS middleware
+app.use(cors());
+
 // Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(express.json());
+
+app.use(cors({
+  origin: '*'
+}));
 
 // Routes
 
 // Main page
-app.get('/', (req, res) => {
-    const {filter, user_id} = req.query || {};
+app.get('/posts', (req, res) => {
+    const { filter } = req.body || {};
 
     db.query('SELECT * FROM blogs', (err, result) => {
         if (err) {
             console.error(err);
-            return res.render('pages/error', { message: 'Database error' });
+            return res.status(500).send({ message: 'Database error' });
         }
 
         const dbPosts = result.rows.map(row => ({
@@ -52,10 +61,10 @@ app.get('/', (req, res) => {
 
         if (filter) {
             const filteredPosts = dbPosts.filter(post => post.category === filter);
-            return res.render('index', { posts: filteredPosts, filter: filter, user_id: user_id });
+            return res.send({ posts: filteredPosts });
         }
 
-        res.render('index', { posts: dbPosts, user_id: user_id });
+        res.send({ posts: dbPosts });
     });
 });
 
