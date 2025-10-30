@@ -22,16 +22,16 @@ function DeletePost() {
             try {
                 const response = await axios.get(`http://localhost/post?id=${id}`);
                 setPost(response.data.post);
-                setLoading(false);
             } catch (err) {
                 console.error("Error fetching post:", err);
                 setError('Error loading post');
-                setLoading(false);
             }
+
+            setLoading(false);
         }
 
         fetchPost();
-    }, [id, user_id]);
+    });
 
     async function handleDelete() {
         try {

@@ -38,7 +38,6 @@ app.use(cors({
 }));
 
 // Routes
-
 app.get('/post', (req, res) => {
     const { id } = req.query || {};
 
@@ -96,95 +95,6 @@ app.get('/posts', (req, res) => {
 
         res.send({ posts: dbPosts });
     });
-});
-
-// Edit post form
-app.get('/edit', (req, res) => {
-    const {id, user_id} = req.query || {};
-
-    if (!id || !user_id) {
-        return res.render('pages/error', { message: 'An error ocurrred loading this page' });
-    }
-
-    db.query(
-        "SELECT * FROM blogs WHERE blog_id = $1",
-        [id],
-        (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.render('pages/error', { message: 'Database error' });
-            }
-
-            if (result.rowCount === 0) {
-                return res.status(404).render('pages/error', { message: 'Post to edit not found' });
-            }
-
-            const dbPost = result.rows[0];
-
-            if (dbPost.creator_user_id !== user_id.trim()) {
-                return res.status(403).render('pages/error', { message: "You are not authorized to edit this post." });
-            }
-
-            const post = {
-                id: dbPost.blog_id,
-                title: dbPost.title,
-                content: dbPost.body,
-                category: dbPost.category
-            };
-
-            res.render('pages/edit', { ...post, user_id: user_id.trim() });
-        }
-    );
-});
-
-// Delete post confirmation page
-app.get('/delete', (req, res) => {
-    const {id, user_id} = req.query || {};
-
-    if (!id || !user_id) {
-        return res.render('pages/error', { message: 'An error ocurrred loading this page' });
-    }
-
-    db.query(
-        "SELECT * FROM blogs WHERE blog_id = $1",
-        [id],
-        (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.render('pages/error', { message: 'Database error' });
-            }
-
-            if (result.rowCount === 0) {
-                return res.status(404).render('pages/error', { message: 'Post to delete not found' });
-            }
-
-            const dbPost = result.rows[0];
-
-            if (dbPost.creator_user_id !== user_id.trim()) {
-                return res.status(403).render('pages/error', { message: "You are not authorized to delete this post." });
-            }
-
-            const values = {
-                id: dbPost.blog_id,
-                title: dbPost.title,
-                content: dbPost.body,
-                author: dbPost.creator_name,
-                user_id: user_id
-            };
-
-            res.render('pages/delete', values);
-        }
-    );
-});
-
-// Sign up page
-app.get('/signup', (req, res) => {
-    res.render('pages/signup');
-});
-
-// Login page
-app.get('/login', (req, res) => {
-    res.render('pages/login');
 });
 
 // Create post logic

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function Signup( { setUserId } ) {
+function Signup() {
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
     const [name, setName] = useState("");
@@ -16,14 +16,13 @@ function Signup( { setUserId } ) {
         setError(null);
 
         try {
-            const response = await axios.post('http://localhost/signup', {
+            await axios.post('http://localhost/signup', {
                 username,
                 name,
                 password,
                 confirm_password: confirmPassword
             });
-
-            setUserId(response.data.user_id);
+            
             navigate('/');
         } catch (err) {
             console.error("Error during signup", err);

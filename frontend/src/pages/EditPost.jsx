@@ -67,9 +67,6 @@ function EditPost() {
         });
     }
 
-    console.log(user_id);
-    console.log(formData.author_id);
-
     if (loading) {
         return <div className="create-form"><p>Loading...</p></div>;
     }

@@ -4,6 +4,7 @@ import Post from "../components/Post";
 import axios from 'axios';
 
 function Home({ user_id }) {
+    // State variables
     const [posts, setPosts] = useState(null);
     const [filter, setFilter] = useState("");
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -13,6 +14,7 @@ function Home({ user_id }) {
         category: ''
     });
 
+    // Fetch posts from backend
     async function fetchPosts() {
         try {
             const response = await axios.get('http://localhost/posts');
@@ -22,6 +24,7 @@ function Home({ user_id }) {
         }
     }
 
+    // API call to create a new post
     async function handleCreatePost(e) {
         e.preventDefault();
         try {
@@ -31,7 +34,7 @@ function Home({ user_id }) {
             });
             setFormData({ title: '', content: '', category: '' });
             setShowCreateForm(false);
-            fetchPosts(); // Refresh posts after creating
+            fetchPosts();
         } catch (err) {
             console.error("Error creating post", err);
         }
