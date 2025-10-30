@@ -2,17 +2,37 @@ import '../index.css';
 import { useState, useEffect } from 'react';
 import Post from "../components/Post";
 import axios from 'axios';
+import PostList from '../components/PostList';
 
 function Home({ user_id }) {
     // State variables
-    const [posts, setPosts] = useState(null);
-    const [filter, setFilter] = useState("");
+    const [posts, setPosts] = useState([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         content: '',
         category: ''
     });
+
+    // API call to create a new post
+    async function handleCreatePost(e) {
+        e.preventDefault();
+        try {
+            await axios.post('http://localhost/create', {
+                ...formData,
+                user_id: user_id
+            });
+
+            setFormData({
+                title: '',
+                content: '',
+                category: ''
+            });
+            setShowCreateForm(false);
+        } catch (err) {
+            console.error("Error creating post", err);
+        }
+    }
 
     // Fetch posts from backend
     async function fetchPosts() {
@@ -24,21 +44,9 @@ function Home({ user_id }) {
         }
     }
 
-    // API call to create a new post
-    async function handleCreatePost(e) {
-        e.preventDefault();
-        try {
-            await axios.post('http://localhost/create', {
-                ...formData,
-                user_id: user_id
-            });
-            setFormData({ title: '', content: '', category: '' });
-            setShowCreateForm(false);
-            fetchPosts();
-        } catch (err) {
-            console.error("Error creating post", err);
-        }
-    }
+    useEffect(() => {
+        fetchPosts();
+    }, []);
 
     function handleInputChange(e) {
         setFormData({
@@ -46,10 +54,6 @@ function Home({ user_id }) {
             [e.target.name]: e.target.value
         });
     }
-
-    useEffect(() => {
-        fetchPosts();
-    }, []);
 
     return (
         <>
@@ -115,33 +119,7 @@ function Home({ user_id }) {
                 </div>
             )}
 
-            {posts ? (
-                <div className="posts-container">
-                    <select 
-                        name="filter" 
-                        className="input-field post-filter-input" 
-                        onChange={(e) => setFilter(e.target.value)}
-                        value={filter}
-                    >
-                        <option value="" disabled>Filter by Category</option>
-                        <option value="General">General</option>
-                        <option value="Tech">Tech</option>
-                        <option value="Lifestyle">Lifestyle</option>
-                        <option value="Food">Food</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="">Show All</option>
-                    </select>
-                    {filter && <p>Currently filtering by: {filter}</p>}
-                    {posts.filter(post => !filter || post.category === filter).map((post, index) => (
-                        <Post key={index} post={post} user_id={user_id} />
-                    ))}
-                </div>
-            ) : (
-                <div className="posts-container">
-                    <p>No posts available.</p>
-                </div>
-            )}
+            <PostList user_id={user_id} posts={posts} />
         </>
     );
 }
