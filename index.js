@@ -39,7 +39,37 @@ app.use(cors({
 
 // Routes
 
-// Main page
+app.get('/post', (req, res) => {
+    const { id } = req.query || {};
+
+    if (!id) {
+        return res.status(400).send({ message: 'Post ID is required' });
+    }
+
+    db.query(
+        "SELECT * FROM blogs WHERE blog_id = $1",
+        [id],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send({ message: 'Database error' });
+            }
+            if (result.rowCount === 0) {
+                return res.status(404).send({ message: 'Post not found' });
+            }
+            const dbPost = result.rows[0];
+            const post = {
+                id: dbPost.blog_id,
+                title: dbPost.title,
+                content: dbPost.body,
+                author: dbPost.creator_name
+            };
+
+            res.send({ post });
+        }
+    );
+});
+
 app.get('/posts', (req, res) => {
     const { filter } = req.body || {};
 
@@ -162,11 +192,11 @@ app.post('/create', async (req, res) => {
     const { title, content, category, user_id } = req.body;
 
     if (!user_id) {
-        return res.render('pages/error', { message: "You must be signed in to create a post." });
+        return res.status(400).send({ message: "You must be signed in to create a post." });
     }
 
     if (!title || !content || !category) {
-        return res.render('pages/error', { message: "All values must be provided to create a post." });
+        return res.status(400).send({ message: "All values must be provided to create a post." });
     }
 
     try {
@@ -176,7 +206,7 @@ app.post('/create', async (req, res) => {
         );
 
         if (getName.rowCount === 0) {
-            return res.render('pages/error', { message: "Invalid user signed in to create post. Sign in again." });
+            return res.status(400).send({ message: "Invalid user signed in to create post. Sign in again." });
         }
 
         const username = getName.rows[0].name;
@@ -186,10 +216,10 @@ app.post('/create', async (req, res) => {
             [username, user_id.trim(), title, content, category]
         );
 
-        res.redirect(`/?user_id=${user_id.trim()}`);
+        res.status(200).send({ message: 'Post created successfully' });
     } catch (err) {
         console.error(err);
-        res.render('pages/error', { message: 'Database error' });
+        res.status(500).send({ message: 'Database error' });
     }
 });
 
@@ -198,7 +228,7 @@ app.post('/edit', (req, res) => {
     const { id, title, content, category, user_id } = req.body || {};
 
     if (!id || !title || !content || !category) {
-        return res.render('pages/error', { message: "All values must be provided to edit a post" });
+        return res.status(400).send({ message: "All values must be provided to edit a post" });
     }
 
     db.query(
@@ -207,10 +237,10 @@ app.post('/edit', (req, res) => {
         (err, result) => {
             if (err) {
                 console.error(err);
-                return res.render('pages/error', { message: "Database error" });
+                return res.status(500).send({ message: "Database error" });
             }
 
-            res.redirect(`/?user_id=${user_id.trim()}`);
+            res.status(200).send({ message: "Post updated successfully" });
         }
     );
 });
@@ -220,7 +250,7 @@ app.post('/delete', (req, res) => {
     const { id, user_id } = req.body || {};
 
     if (!id || !user_id) {
-        return res.render('pages/error', { message: "A post ID must be provided to delete a post." });
+        return res.status(400).send({ message: "A post ID must be provided to delete a post." });
     }
 
     db.query(
@@ -229,10 +259,10 @@ app.post('/delete', (req, res) => {
         (err, result) => {
             if (err) {
                 console.error(err);
-                return res.render('pages/error', { message: "Database error" });
+                return res.status(500).send({ message: "Database error" });
             }
 
-            res.redirect(`/?user_id=${user_id.trim()}`);
+            res.status(200).send({ message: "Post deleted successfully" });
         }
     );
 });
@@ -243,11 +273,11 @@ app.post('/signup', async (req, res) => {
         const { username, password, confirm_password, name } = req.body || {};
 
         if (!username || !password || !confirm_password || !name) {
-            return res.render('pages/signup', { error: 'All values must be provided' });
+            return res.status(400).send({ error: 'All values must be provided' });
         }
 
         if (password.trim() !== confirm_password.trim()) {
-            return res.render('pages/signup', { error: 'Confirm password must match' });
+            return res.status(400).send({ error: 'Confirm password must match' });
         }
 
         // Check if user exists
@@ -257,7 +287,7 @@ app.post('/signup', async (req, res) => {
         );
 
         if (check.rowCount > 0) {
-            return res.render('pages/signup', { error: 'Username already taken' });
+            return res.status(400).send({ error: 'Username already taken' });
         }
 
         // If user does not exist, insert new user
@@ -266,10 +296,10 @@ app.post('/signup', async (req, res) => {
             [username.trim(), password.trim(), name.trim()]
         );
 
-        return res.redirect('/login');
+        return res.status(200).send({ message: 'User created successfully', user_id: username.trim() });
     } catch (err) {
         console.error(err);
-        return res.render('pages/error', { message: 'Database error' });
+        return res.status(500).send({ error: 'Database error' });
     }
 });
 
@@ -278,7 +308,7 @@ app.post('/login', (req, res) => {
     const {username, password} = req.body || {};
 
     if (!username || !password) {
-        return res.render('pages/login', { error: 'All values must be provided' });
+        return res.status(400).send({ error: 'All values must be provided' });
     }
 
     db.query(
@@ -287,14 +317,14 @@ app.post('/login', (req, res) => {
         (err, result) => {
             if (err) {
                 console.error(err);
-                return res.render('pages/error', { message: 'Database error' });
+                return res.status(500).send({ error: 'Database error' });
             }
 
             if (result.rowCount === 0) {
-                return res.render('pages/login', { error: 'Incorrect username or password' });
+                return res.status(400).send({ error: 'Incorrect username or password' });
             }
 
-            res.redirect(`/?user_id=${username.trim()}`);
+            res.status(200).send({ message: 'Login successful', user_id: username.trim() });
         }
     );
 });
